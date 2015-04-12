@@ -12,14 +12,6 @@ long pid;    /* Process' id */
 char data[DATASIZE]; /* Process' data */
 int leader = 6; // guarda o lider do ds
 
-typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
-typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
-
-
-typedef struct msgbuf {
-  long mtype;      /* message type */
-  contentMsg c;
-} Msgbuf;
 
 void get_pid_from_argv(int argc, char* argv[]) {
 
