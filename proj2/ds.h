@@ -15,6 +15,15 @@
 #define DS_MESSAGE_TYPE 1
 #define MONITOR_PID 0
 
+typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
+typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
+
+typedef struct msgbuf {
+  long mtype;      /* message type */
+  contentMsg c;
+  int receiver;
+} Msgbuf;
+
 /* Get N communication queues */
 void get_queues();  
 

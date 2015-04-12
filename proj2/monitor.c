@@ -15,7 +15,8 @@ int leader;
 #define HEIGHT 15
 #define WIDTH 33
 int from, to;
-char msg[100] = {"OK"};
+const char* current_msg_content;
+const char msgs[4][100] = {{"ELECTION"},{"OK"}, {"COORDINATOR"},{"GENERIC"}};
 int is_dead[10];
 int asc_msg_size;
 
@@ -40,9 +41,9 @@ void printpid(int pid) {
 	if(from==pid) {
 		char asc_msg[100], aux[50];
 		asc_msg[0] = '\0';
-		sprintf(aux," %s→",msg);
+		sprintf(aux," %s→",current_msg_content);
 		strcat(asc_msg, aux);
-		if(!to) {
+		if(to==-1) {
 			sprintf(aux,"*");
 			strcat(asc_msg, aux);
 		}
@@ -72,10 +73,22 @@ void print_system_status() {
 }
 
 int main() {
+	Msgbuf inbuf;
+	leader = -1;
 	memset(is_dead, 0, sizeof(is_dead));
-	get_queues();  
+	get_queues();
 	while(1) {
-		
+		if (nowait_receive_message(MONITOR_PID, &inbuf, sizeof(Msgbuf)) == 0) {
+			from = inbuf.mtype;
+			to = inbuf.receiver;
+			current_msg_content = msgs[inbuf.c];
+			if(inbuf.c == COORDINATOR) {
+				to = -1;
+				leader = inbuf.mtype;
+			}
+			print_system_status();
+		}
+		sleep(1000);
 	}
 	return 0;
 }

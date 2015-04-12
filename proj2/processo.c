@@ -13,14 +13,6 @@ long pid;    /* Process' id */
 char data[DATASIZE]; /* Process' data */
 int leader = 6; // guarda o lider do ds
 
-typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
-typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
-
-
-typedef struct msgbuf {
-  long mtype;      /* message type */
-  contentMsg c;
-} Msgbuf;
 
 void get_pid_from_argv(int argc, char* argv[]) {
 
@@ -77,7 +69,7 @@ int main(int argc, char* argv[]) {
 		else if (pState == LEADER){			
 			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // se nao tem mensagem espera e entao continua o processo 
 				sleep(SLEEP_TIME);								
-			} else if (inbuf.c == ELECTION && inbuf.mtype > pid) { // processa a mensagem					
+			} else if (inbuf.c == ELECTION && inbuf.mtype < pid) { // processa a mensagem					
 				outbuf.c = OK;
 				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 				pState = CALL_ELECTION;						
@@ -98,7 +90,18 @@ int main(int argc, char* argv[]) {
 				// LIDER MORREU!! :(
 				// pedir eleicao
 					pState = CALL_ELECTION;
-				
+				}
+				else if (inbuf.c == COORDINATOR){
+					leader = inbuf.mtype;
+					pState = IDLE;
+				}
+				else if (inbuf.c == ELECTION && inbuf.mtype < pid){
+					output.c = OK;
+					send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+					pState = CALL_ELECTION;
+				}
+				else if (inbuf.c == GENERIC){ // lider respondeu! ele ainda esta vivo!!
+					pState = IDLE;					
 				}
 			}
 		}

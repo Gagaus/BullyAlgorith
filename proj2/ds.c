@@ -24,11 +24,15 @@ void get_queues() {
 
 /* Send a message to Pj */
 void send_message(int j, const void* buffer, size_t msgsize) {
-  
+  ((Msgbuf*)buffer)->receiver = j;
   if (msgsnd(queue_id[j], buffer, msgsize, 0) == -1) {
     perror("msgsnd error");
     exit(2);
   }
+  if (msgsnd(queue_id[MONITOR_PID], buffer, msgsize, 0) == -1) {
+    perror("msgsnd to monitor error");
+    exit(2);
+  }  
 }
 
 /* Broadcast a message to all processes, including itself */
