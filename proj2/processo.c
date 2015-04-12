@@ -8,9 +8,9 @@
 #define SLEEP_TIME 1
 #define TIME_OF_DEATH 40
 
-int pid;    /* Process' id */
+long pid;    /* Process' id */
 char data[DATASIZE]; /* Process' data */
-int leader; // guarda o lider do ds
+int leader = 6; // guarda o lider do ds
 
 typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
 typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
@@ -52,18 +52,29 @@ int main(int argc, char* argv[]) {
 		int e = rand() % 100;
 		if (e==1)
 			pState = DEAD;
-		if (pState == IDLE){
+		else if (pState == IDLE){
 			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
-			
+				output.c = GENERIC;
+				send_message(leader, &outbuf, sizeof(Msgbuf));
 			}
 			else{
 				sleep (SLEEP_TIME);
-				// receber mensgaens e verificar se eh do tipo COORDINATOR
+				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) == 0){
+					if (inbuf.c == COORDINATOR){
+						leader = inbuf.mtype; // novo lider eh quem mandou a mensagem
+					}
+					else if (inbuf.c == ELECTION && inbuf.mtype < pid){
+						output.c = OK;
+						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+						pState = CALL_ELECTION;
+					}
+				}
+				
 			}
 			
 		}
-		if (pState == LEADER){
+		else if (pState == LEADER){
 			// RECEBER MENSAGENS GENERICAS. SE RECEBER, ENVIAR OUTRA DE VOLTA
 		}
 		else if (pState == WAITING_LEADER){
@@ -73,6 +84,7 @@ int main(int argc, char* argv[]) {
 					sleep(SLEEP_TIME);
 					j++;
 				// LIDER MORREU!! :(
+				// pedir eleicao
 					pState = CALL_ELECTION;
 				
 				}
