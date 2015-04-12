@@ -44,8 +44,9 @@ int main(int argc, char* argv[]) {
 	
 	while(true){
 		int e = rand() % 100;
-		if (e==1)
+		if (e==1){
 			pState = DEAD;
+		}
 		else if (pState == IDLE){
 			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
