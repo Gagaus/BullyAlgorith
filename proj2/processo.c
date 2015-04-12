@@ -49,45 +49,50 @@ int main(int argc, char* argv[]) {
 	srand(time(NULL));
 	
 	while(true){
+		int e = rand() % 100;
+		if (e==1)
+			pState = DEAD;
 		if (pState == IDLE){
-			int e = rand() % 100;
-			if (e == 1){ // manda msg pro lider
+			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
 			
 			}
 			else{
-				// espera um pouco
-				sleep (SLEEP_TIME)
+				sleep (SLEEP_TIME);
+				// receber mensgaens e verificar se eh do tipo COORDINATOR
 			}
 			
 		}
 		if (pState == LEADER){
-			int e = rand() % 100;
-			if (e==1) {
-				// MORRER.
-				pState = DEAD;
-			}
-			else{// RECEBER MENSAGENS GENERICAS. SE RECEBER, ENVIAR OUTRA DE VOLTA
-				
-			}
+			// RECEBER MENSAGENS GENERICAS. SE RECEBER, ENVIAR OUTRA DE VOLTA
 		}
 		else if (pState == WAITING_LEADER){
-			sleep(TIMEOUT);
-			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){
+			int j = 0;
+			while (j < TIMEOUT){
+				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // FAZER WHILE POR TEMṔO. 
+					sleep(SLEEP_TIME);
+					j++;
 				// LIDER MORREU!! :(
 				// pedir eleicao
+					pState = CALLED_ELECTION;
 				
+				}
 			}
 		}
 		else if (pState == CALLED_ELECTION){
-			sleep(TIMEOUT);
-			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){
-				// se nao ha mensagens pra mim, o lider sou eu! :D
-				// fazer broadcast 
-			}
-			else{
-				// se ha mensagem do tipo OK, minha parte acabou
-				pState = IDLE;
+			int j = 0;
+			while (j < TIMEOUT){
+				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // FAZER WHILE POR TEMṔO. 
+					sleep(SLEEP_TIME);
+					j++;
+					// se nao ha mensagens pra mim, o lider sou eu! :D
+					leader = pid;
+					// fazer broadcast 
+				}
+				else{
+					// se ha mensagem do tipo OK, minha parte acabou
+					pState = IDLE;
+				}
 			}
 		}
 		else if (pState == DEAD){
