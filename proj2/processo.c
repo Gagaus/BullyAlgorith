@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		else if (pState == CALL_ELECTION){
+			//pedir eleicao
 			int j = 0;
 			while (j < TIMEOUT){
 				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // FAZER WHILE POR TEMṔO. 
@@ -108,8 +109,9 @@ int main(int argc, char* argv[]) {
 		}
 		else if (pState == DEAD){
 			sleep(TIME_OF_DEATH);
-			// zerar minha fila
-			// pedir eleicao
+			while (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) != -1)
+				{} // zera minha fila
+			pState = CALL_ELECTION;
 		}
 	}                 
 	return 0;
