@@ -16,7 +16,7 @@ void get_queues() {
   key_t key;
 
   for (i = 0, key = QUEUE_KEY_PREFIX; i < N; i++, key++)
-    if ((queue_id[i] = msgget(key, IPC_CREAT | 0700)) == -1) {
+    if ((queue_id[i] = msgget(key+i, IPC_CREAT | 0700)) == -1) {
       perror("msgget error");
       exit(2);
     }
@@ -24,6 +24,7 @@ void get_queues() {
 
 /* Send a message to Pj */
 void send_message(int j, const void* buffer, size_t msgsize) {
+  printf("quero mandar msg %d",j);
   ((Msgbuf*)buffer)->receiver = j;
   if (msgsnd(queue_id[j], buffer, msgsize, 0) == -1) {
     perror("msgsnd error");
