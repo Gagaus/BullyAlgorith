@@ -33,7 +33,7 @@ void get_pid_from_argv(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
   int l,i,j;
   Msgbuf inbuf, outbuf;
-
+  int idLeader;
   get_pid_from_argv(argc, argv);
 
   get_queues();
@@ -41,7 +41,16 @@ int main(int argc, char* argv[]) {
   srand(time(NULL));
 
   while(true){
-    
+	int e = rand() % 100;
+    switch (e) {
+    case 0: // morre
+		sleep(TIME_OF_DEATH);
+		// zerar queue
+		// chamar eleicao
+		break;
+	case 1: // manda msg pro lider
+		break;
+	
   }                 
   return 0;
 }
