@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 		else if (pState == LEADER){			
 			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // se nao tem mensagem espera e entao continua o processo 
 				sleep(SLEEP_TIME);								
-			} else if (inbuf.c == ELECTION && inbuf.mtype > pid) { // processa a mensagem					
+			} else if (inbuf.c == ELECTION && inbuf.mtype < pid) { // processa a mensagem					
 				outbuf.c = OK;
 				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 				pState = CALL_ELECTION;						
@@ -98,7 +98,18 @@ int main(int argc, char* argv[]) {
 				// LIDER MORREU!! :(
 				// pedir eleicao
 					pState = CALL_ELECTION;
-				
+				}
+				else if (inbuf.c == COORDINATOR){
+					leader = inbuf.mtype;
+					pState = IDLE;
+				}
+				else if (inbuf.c == ELECTION && inbuf.mtype < pid){
+					output.c = OK;
+					send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+					pState = CALL_ELECTION;
+				}
+				else if (inbuf.c == GENERIC){ // lider respondeu! ele ainda esta vivo!!
+					pState = IDLE;					
 				}
 			}
 		}
@@ -115,7 +126,7 @@ int main(int argc, char* argv[]) {
 			}
 			if (rcv < 0) { // se nao ha mensagens pra mim, o lider sou eu! :D
 				leader = pid;
-				c = COORDINATOR;
+				outbuf.c = COORDINATOR;
 				broadcast(&outbuf, sizeof(outbuf));
 			}
 			else{
