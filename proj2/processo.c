@@ -34,6 +34,7 @@ void get_pid_from_argv(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
 	get_pid_from_argv(argc, argv);
 	state pState = (pid==6) ? LEADER : IDLE;
+	printf("Sou o processo %ld\n", pid);
 	Msgbuf inbuf, outbuf;
 	outbuf.mtype = pid;
 	
@@ -43,18 +44,22 @@ int main(int argc, char* argv[]) {
 	
 	while(1){
 		int e = rand() % 3;
-		if (e==1){
+		/*if (e==1){
 			pState = DEAD;
-		}
-		else if (pState == IDLE){
+			printf("p1: MORRI\n");
+		}*/
+		if (pState == IDLE){
 			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
 				outbuf.c = GENERIC;
 				send_message(leader, &outbuf, sizeof(Msgbuf));
+				printf ("p%ld: Mandei generic pro lider\n", pid);
 			}
 			else{
+				printf("p%ld: Vou dormir e verificar se a mensagens\n", pid);
 				sleep (SLEEP_TIME);
 				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) == 0){
+					printf("p%ld: Tem mensagem pra mim!\n", pid);
 					if (inbuf.c == COORDINATOR){
 						leader = inbuf.mtype; // novo lider eh quem mandou a mensagem
 					}
@@ -67,7 +72,6 @@ int main(int argc, char* argv[]) {
 			}			
 		}
 		else if (pState == LEADER) {	
-				
 			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0) { // se nao tem mensagem espera e entao continua o processo 
 				sleep(SLEEP_TIME);								
 			} else if (inbuf.c == ELECTION && inbuf.mtype < pid) { // processa a mensagem					
@@ -108,6 +112,7 @@ int main(int argc, char* argv[]) {
 		}
 		else if (pState == CALL_ELECTION){
 			//pedi eleicao
+			printf("p%ld: vou pedir eleicao\n", pid);
 			int j;
 			for (j = pid+1; j <= NUM_PROCESS; j++)
 				send_message(j, &outbuf, sizeof(Msgbuf));
@@ -127,9 +132,11 @@ int main(int argc, char* argv[]) {
 					rcv = -1;
 			}
 			if (rcv < 0) { // se nao ha mensagens pra mim, o lider sou eu! :D
+				printf("p%ld: sou o lider! vou fazer o broadcast\n", pid);
 				leader = pid;
 				outbuf.c = COORDINATOR;
 				broadcast(&outbuf, sizeof(outbuf));
+				pState = IDLE;
 			}
 			else				
 				pState = IDLE; // se ha mensagem do tipo OK, minha parte acabou
@@ -140,7 +147,7 @@ int main(int argc, char* argv[]) {
 				{} // zera minha fila
 			pState = CALL_ELECTION;
 		}
-	}                 
+	}
 	return 0;
 	}
 	
