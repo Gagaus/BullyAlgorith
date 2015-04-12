@@ -13,7 +13,7 @@
 #define N 7
 
 #define QUEUE_KEY_PREFIX 256
-#define DS_MESSAGE_TYPE 1
+#define DS_MESSAGE_TYPE 0
 #define MONITOR_PID 0
 
 typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;

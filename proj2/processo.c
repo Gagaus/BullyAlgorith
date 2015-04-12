@@ -32,10 +32,10 @@ void get_pid_from_argv(int argc, char* argv[]) {
 
 
 int main(int argc, char* argv[]) {
-	get_pid_from_argv(argc, argv);
-	state pState = (pid==6) ? LEADER : IDLE;
+	state pState = IDLE;
 	Msgbuf inbuf, outbuf;
 	outbuf.mtype = pid;
+	get_pid_from_argv(argc, argv);
 	
 	get_queues();
 	
