@@ -32,16 +32,18 @@ void get_pid_from_argv(int argc, char* argv[]) {
 
 
 int main(int argc, char* argv[]) {
+	int l,i,j;
 	state pState = IDLE;
 	Msgbuf inbuf, outbuf;
 	outbuf.mtype = pid;
+	int idLeader;
 	get_pid_from_argv(argc, argv);
 	
 	get_queues();
 	
 	srand(time(NULL));
 	
-	while(1){
+	while(true){
 		int e = rand() % 100;
 		if (e==1){
 			pState = DEAD;
@@ -49,7 +51,7 @@ int main(int argc, char* argv[]) {
 		else if (pState == IDLE){
 			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
-				outbuf.c = GENERIC;
+				output.c = GENERIC;
 				send_message(leader, &outbuf, sizeof(Msgbuf));
 			}
 			else{
@@ -59,7 +61,7 @@ int main(int argc, char* argv[]) {
 						leader = inbuf.mtype; // novo lider eh quem mandou a mensagem
 					}
 					else if (inbuf.c == ELECTION && inbuf.mtype < pid){
-						outbuf.c = OK;
+						output.c = OK;
 						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 						pState = CALL_ELECTION;
 					}
@@ -97,7 +99,7 @@ int main(int argc, char* argv[]) {
 					pState = IDLE;
 				}
 				else if (inbuf.c == ELECTION && inbuf.mtype < pid){
-					outbuf.c = OK;
+					output.c = OK;
 					send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 					pState = CALL_ELECTION;
 				}
@@ -118,7 +120,7 @@ int main(int argc, char* argv[]) {
 					if (rcv == 0 && inbuf.c == COORDINATOR)
 						leader = inbuf.mtype; 
 					else if (rcv == 0 && inbuf.c == ELECTION && inbuf.mtype < pid){
-						outbuf.c = OK;
+						output.c = OK;
 						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 					}
 					if (rcv == 0 && inbuf.c == OK)

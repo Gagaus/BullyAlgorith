@@ -9,7 +9,6 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
-#define DATASIZE 10
 #define N 7
 
 #define QUEUE_KEY_PREFIX 256
