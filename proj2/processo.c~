@@ -69,14 +69,14 @@ int main(int argc, char* argv[]) {
 			} else if (inbuf.c == ELECTION) { // processa a mensagem	
 				if (inbuf.mtype > pid) {
 					outbuf.c = OK;
-					send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));					
+					send_message(inbuf.mtype, outbuf, sizeof(Msgbuf));					
 				}
 			} else if (inbuf.c == COORDINATOR) {
 				leader = inbuf.mtype;
 				pState = IDLE;
 			} else if (inbuf.c == GENERIC) {
 				outbuf.c = GENERIC;
-				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+				send_message(inbuf.mtype, outbuf, sizeof(Msgbuf));
 			}			
 		}
 		else if (pState == WAITING_LEADER){
