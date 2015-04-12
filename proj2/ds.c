@@ -24,7 +24,9 @@ void get_queues() {
 
 /* Send a message to Pj */
 void send_message(int j, const void* buffer, size_t msgsize) {
-  printf("quero mandar msg %d",j);
+
+  printf("(%d,%d)\n", ((Msgbuf*)buffer)->mtype, j);
+
   ((Msgbuf*)buffer)->receiver = j;
   if (msgsnd(queue_id[j], buffer, msgsize, 0) == -1) {
     perror("msgsnd error");

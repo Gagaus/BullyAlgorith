@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
 	printf("Sou o processo %ld\n", pid);
 	Msgbuf inbuf, outbuf;
 	outbuf.mtype = pid;
+	get_pid_from_argv(argc, argv);
 	
 	get_queues();
 	

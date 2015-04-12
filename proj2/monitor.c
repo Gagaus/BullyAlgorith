@@ -75,21 +75,20 @@ void print_system_status() {
 
 int main() {
 	Msgbuf inbuf;
-	leader = -1;
+	leader = 6;
 	memset(is_dead, 0, sizeof(is_dead));
 	get_queues();
 	while(1) {
-		if (nowait_receive_message(MONITOR_PID, &inbuf, sizeof(Msgbuf)) == 0) {
-			from = inbuf.mtype;
-			to = inbuf.receiver;
-			current_msg_content = msgs[inbuf.c];
-			if(inbuf.c == COORDINATOR) {
-				to = -1;
-				leader = inbuf.mtype;
-			}
-			print_system_status();
+		receive_message(MONITOR_PID, &inbuf, sizeof(Msgbuf));
+		from = inbuf.mtype;
+		to = inbuf.receiver;
+		current_msg_content = msgs[inbuf.c];
+		if(inbuf.c == COORDINATOR) {
+			to = -1;
+			leader = inbuf.mtype;
 		}
-		sleep(1000);
+		ymove(20);
+		print_system_status();
 	}
 	return 0;
 }
