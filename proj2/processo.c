@@ -13,14 +13,6 @@ long pid;    /* Process' id */
 char data[DATASIZE]; /* Process' data */
 int leader = 6; // guarda o lider do ds
 
-typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
-typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
-
-
-typedef struct msgbuf {
-  long mtype;      /* message type */
-  contentMsg c;
-} Msgbuf;
 
 void get_pid_from_argv(int argc, char* argv[]) {
 
@@ -52,8 +44,9 @@ int main(int argc, char* argv[]) {
 	
 	while(true){
 		int e = rand() % 100;
-		if (e==1)
+		if (e==1){
 			pState = DEAD;
+		}
 		else if (pState == IDLE){
 			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
@@ -99,7 +92,18 @@ int main(int argc, char* argv[]) {
 				// LIDER MORREU!! :(
 				// pedir eleicao
 					pState = CALL_ELECTION;
-				
+				}
+				else if (inbuf.c == COORDINATOR){
+					leader = inbuf.mtype;
+					pState = IDLE;
+				}
+				else if (inbuf.c == ELECTION && inbuf.mtype < pid){
+					output.c = OK;
+					send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+					pState = CALL_ELECTION;
+				}
+				else if (inbuf.c == GENERIC){ // lider respondeu! ele ainda esta vivo!!
+					pState = IDLE;					
 				}
 			}
 		}
@@ -110,19 +114,26 @@ int main(int argc, char* argv[]) {
 				send_message(j, &outbuf, sizeof(Msgbuf));
 			int rcv = -1;
 			time_t inicial_t = time(NULL);
-			while (time(NULL) - inicial_t < TIMEOUT && rcv = nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) && rcv < 0 && inbuf.c != OK) {
+			while (time(NULL) - inicial_t < TIMEOUT) {
+					rcv = nowait_receive_message(pid, &inbuf, sizeof(Msgbuf));
+					if (rcv == 0 && inbuf.c == COORDINATOR)
+						leader = inbuf.mtype; 
+					else if (rcv == 0 && inbuf.c == ELECTION && inbuf.mtype < pid){
+						output.c = OK;
+						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+					}
+					if (rcv == 0 && inbuf.c == OK)
+						break;
 					sleep(SLEEP_TIME);
-					// fix the shit
+					rcv = -1;
 			}
 			if (rcv < 0) { // se nao ha mensagens pra mim, o lider sou eu! :D
 				leader = pid;
-				c = COORDINATOR;
+				outbuf.c = COORDINATOR;
 				broadcast(&outbuf, sizeof(outbuf));
 			}
-			else{
-				// se ha mensagem do tipo OK, minha parte acabou
-				pState = IDLE;
-			}
+			else				
+				pState = IDLE; // se ha mensagem do tipo OK, minha parte acabou
 		}
 		else if (pState == DEAD){
 			sleep(TIME_OF_DEATH);
