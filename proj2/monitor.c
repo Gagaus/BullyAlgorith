@@ -8,7 +8,7 @@
 #include <time.h>
 #include <string.h>
 
-// #include "ds.h"
+#include "ds.h"
 
 int leader;
 
@@ -18,6 +18,8 @@ int from, to;
 char msg[100] = {"OK"};
 int is_dead[10];
 int asc_msg_size;
+
+int queue_id[N];
 
 void xmove(int dx) {
 	int i;
@@ -70,16 +72,10 @@ void print_system_status() {
 }
 
 int main() {
-	srand(time(NULL));
 	memset(is_dead, 0, sizeof(is_dead));
+	get_queues();  
 	while(1) {
-		system("clear");
-		from = rand()%6 + 1;
-		to = rand()%6 + 1;
-		leader = rand()%6 + 1;
-		print_system_status(-1,-1,'c');
-		int i;
-		for(i=0; i<1000000000; ++i);
+		
 	}
 	return 0;
 }
