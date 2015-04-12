@@ -109,19 +109,26 @@ int main(int argc, char* argv[]) {
 				send_message(j, &outbuf, sizeof(Msgbuf));
 			int rcv = -1;
 			time_t inicial_t = time(NULL);
-			while (time(NULL) - inicial_t < TIMEOUT && rcv = nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) && rcv < 0 && inbuf.c != OK) {
+			while (time(NULL) - inicial_t < TIMEOUT) {
+					rcv = nowait_receive_message(pid, &inbuf, sizeof(Msgbuf));
+					if (rcv == 0 && inbuf.c == COORDINATOR)
+						leader = inbuf.mtype; 
+					else if (rcv == 0 && inbuf.c == ELECTION && inbuf.mtype < pid){
+						output.c = OK;
+						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
+					}
+					if (rcv == 0 && inbuf.c == OK)
+						break;
 					sleep(SLEEP_TIME);
-					// fix the shit
+					rcv = -1;
 			}
 			if (rcv < 0) { // se nao ha mensagens pra mim, o lider sou eu! :D
 				leader = pid;
-				c = COORDINATOR;
+				outbuf.c = COORDINATOR;
 				broadcast(&outbuf, sizeof(outbuf));
 			}
-			else{
-				// se ha mensagem do tipo OK, minha parte acabou
-				pState = IDLE;
-			}
+			else				
+				pState = IDLE; // se ha mensagem do tipo OK, minha parte acabou
 		}
 		else if (pState == DEAD){
 			sleep(TIME_OF_DEATH);
