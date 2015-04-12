@@ -13,7 +13,7 @@ char data[DATASIZE]; /* Process' data */
 int leader; // guarda o lider do ds
 
 typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
-typedef enum {IDLE, DEAD, CALLED_ELECTION, WAITING_LEADER, LEADER} state;
+typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
 
 
 typedef struct msgbuf {
@@ -73,13 +73,13 @@ int main(int argc, char* argv[]) {
 					sleep(SLEEP_TIME);
 					j++;
 				// LIDER MORREU!! :(
-				// pedir eleicao
-					pState = CALLED_ELECTION;
+					pState = CALL_ELECTION;
 				
 				}
 			}
 		}
-		else if (pState == CALLED_ELECTION){
+		else if (pState == CALL_ELECTION){
+			//pedir eleicao
 			int j = 0;
 			while (j < TIMEOUT){
 				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // FAZER WHILE POR TEMṔO. 
@@ -97,8 +97,9 @@ int main(int argc, char* argv[]) {
 		}
 		else if (pState == DEAD){
 			sleep(TIME_OF_DEATH);
-			// zerar minha fila
-			// pedir eleicao
+			while (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) != -1)
+				{} // zera minha fila
+			pState = CALL_ELECTION;
 		}
 	}                 
 	return 0;
