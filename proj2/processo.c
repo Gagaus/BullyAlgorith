@@ -74,10 +74,11 @@ int main(int argc, char* argv[]) {
 				}				
 			}			
 		}
-		else if (pState == LEADER){			
-			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // se nao tem mensagem espera e entao continua o processo 
+		else if (pState == LEADER) {	
+				
+			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0) { // se nao tem mensagem espera e entao continua o processo 
 				sleep(SLEEP_TIME);								
-			} else if (inbuf.c == ELECTION && inbuf.mtype > pid) { // processa a mensagem					
+			} else if (inbuf.c == ELECTION && inbuf.mtype < pid) { // processa a mensagem					
 				outbuf.c = OK;
 				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 				pState = CALL_ELECTION;						

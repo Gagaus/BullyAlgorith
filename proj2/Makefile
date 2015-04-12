@@ -1,9 +1,11 @@
 CC = gcc
 CFLAGS = -Wall -g
 
-PROGRAMS = monitor
+PROGRAMS = monitor processo ds
 
 all: $(PROGRAMS)
+
+processo: ds.o processo.c
 
 monitor: ds.o monitor.c
 
