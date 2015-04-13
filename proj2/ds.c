@@ -25,7 +25,7 @@ void get_queues() {
 /* Send a message to Pj */
 void send_message(int j, const void* buffer, size_t msgsize) {
 
-  printf("(%d,%d)\n", ((Msgbuf*)buffer)->mtype, j);
+  printf("(%ld,%d)\n", ((Msgbuf*)buffer)->mtype, j);
 
   ((Msgbuf*)buffer)->receiver = j;
   if (msgsnd(queue_id[j], buffer, msgsize, 0) == -1) {
@@ -41,8 +41,11 @@ void send_message(int j, const void* buffer, size_t msgsize) {
 /* Broadcast a message to all processes, including itself */
 void broadcast(const void* buffer, size_t msgsize) {
   int i;
-  for (i = 0; i < N; i++)
+  long aux= ((Msgbuf*)buffer)->mtype;
+  for (i = 0; i < N; i++){
+    ((Msgbuf*)buffer)->mtype = aux;
     send_message(i, buffer, msgsize);
+  }
 }
 
 /* Wait for a new message */ 

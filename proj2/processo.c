@@ -7,7 +7,7 @@
 
 #define TIMEOUT 10
 #define SLEEP_TIME 1
-#define TIME_OF_DEATH 40
+#define TIME_OF_DEATH 10
 #define NUM_PROCESS 6
 
 long pid;    /* Process' id */
@@ -44,15 +44,16 @@ int main(int argc, char* argv[]) {
 	srand(time(NULL));
 	
 	while(1){
-		int e = rand() % 3;
-		/*if (e==1){
+		int e = rand() % 7;
+		if (e==pid){
 			pState = DEAD;
-			printf("p1: MORRI\n");
-		}*/
-		if (pState == IDLE){
+			printf("p%ld: MORRI\n", pid);
+		}
+		else if (pState == IDLE){
 			if (e == 2){ // manda msg pro lider
 				pState = WAITING_LEADER;
 				outbuf.c = GENERIC;
+				outbuf.mtype = pid;
 				send_message(leader, &outbuf, sizeof(Msgbuf));
 				printf ("p%ld: Mandei generic pro lider\n", pid);
 			}
@@ -66,24 +67,27 @@ int main(int argc, char* argv[]) {
 					}
 					else if (inbuf.c == ELECTION && inbuf.mtype < pid){
 						outbuf.c = OK;
+						outbuf.mtype = pid;
 						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 						pState = CALL_ELECTION;
 					}
 				}				
 			}			
 		}
-		else if (pState == LEADER) {	
+		else if (pState == LEADER) {
+			printf("p%ld: Entrei no modo lider!\n", pid);
 			if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0) { // se nao tem mensagem espera e entao continua o processo 
 				sleep(SLEEP_TIME);								
 			} else if (inbuf.c == ELECTION && inbuf.mtype < pid) { // processa a mensagem					
 				outbuf.c = OK;
-				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
-				pState = CALL_ELECTION;						
-			} else if (inbuf.c == COORDINATOR) {
+				outbuf.mtype = pid;
+				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));					
+			} else if (inbuf.c == COORDINATOR && inbuf.mtype != pid) {
 				leader = inbuf.mtype;
 				pState = IDLE;
 			} else if (inbuf.c == GENERIC) {
 				outbuf.c = GENERIC;
+				outbuf.mtype = pid;
 				send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 			}	
 		}
@@ -100,14 +104,18 @@ int main(int argc, char* argv[]) {
 				else if (inbuf.c == COORDINATOR){
 					leader = inbuf.mtype;
 					pState = IDLE;
+					break;
 				}
 				else if (inbuf.c == ELECTION && inbuf.mtype < pid){
 					outbuf.c = OK;
+					outbuf.mtype = pid;
 					send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 					pState = CALL_ELECTION;
+					break;
 				}
 				else if (inbuf.c == GENERIC){ // lider respondeu! ele ainda esta vivo!!
-					pState = IDLE;					
+					pState = IDLE;		
+					break;			
 				}
 			}
 		}
@@ -115,16 +123,24 @@ int main(int argc, char* argv[]) {
 			//pedi eleicao
 			printf("p%ld: vou pedir eleicao\n", pid);
 			int j;
-			for (j = pid+1; j <= NUM_PROCESS; j++)
+			for (j = pid+1; j <= NUM_PROCESS; j++){
+				outbuf.c = ELECTION;
+				outbuf.mtype = pid;
 				send_message(j, &outbuf, sizeof(Msgbuf));
+			}
 			int rcv = -1;
-			time_t inicial_t = time(NULL);
-			while (time(NULL) - inicial_t < TIMEOUT) {
+			int k = 0;
+			while (k < TIMEOUT){
+					k++;
+					//printf("p%ld: Entrei no while d CALL_ELECTION\n", pid);
 					rcv = nowait_receive_message(pid, &inbuf, sizeof(Msgbuf));
+					//printf ("p%ld: Recebi a mensagem: %d, de %ld\n", pid, inbuf.c, inbuf.mtype);
 					if (rcv == 0 && inbuf.c == COORDINATOR)
 						leader = inbuf.mtype; 
 					else if (rcv == 0 && inbuf.c == ELECTION && inbuf.mtype < pid){
 						outbuf.c = OK;
+						printf("p%ld: vou mandar um OK\n", pid);
+						outbuf.mtype = pid;
 						send_message(inbuf.mtype, &outbuf, sizeof(Msgbuf));
 					}
 					if (rcv == 0 && inbuf.c == OK)
@@ -136,13 +152,15 @@ int main(int argc, char* argv[]) {
 				printf("p%ld: sou o lider! vou fazer o broadcast\n", pid);
 				leader = pid;
 				outbuf.c = COORDINATOR;
+				outbuf.mtype = pid;
 				broadcast(&outbuf, sizeof(outbuf));
-				pState = IDLE;
+				pState = LEADER;
 			}
 			else				
 				pState = IDLE; // se ha mensagem do tipo OK, minha parte acabou
 		}
-		else if (pState == DEAD){
+		if (pState == DEAD){
+			printf("p%ld: Continuo dead :(\n", pid);
 			sleep(TIME_OF_DEATH);
 			while (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) != -1)
 				{} // zera minha fila

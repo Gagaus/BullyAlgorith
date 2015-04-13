@@ -42,7 +42,7 @@ void printpid(int pid) {
 	if(from==pid) {
 		char asc_msg[100], aux[50];
 		asc_msg[0] = '\0';
-		sprintf(aux," %s→",current_msg_content);
+		sprintf(aux," %s→  ",current_msg_content);
 		strcat(asc_msg, aux);
 		if(to==-1) {
 			sprintf(aux,"*");
@@ -89,6 +89,7 @@ int main() {
 		}
 		ymove(20);
 		print_system_status();
+		sleep(1);
 	}
 	return 0;
 }
