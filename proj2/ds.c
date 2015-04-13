@@ -24,9 +24,7 @@ void get_queues() {
 
 /* Send a message to Pj */
 void send_message(int j, const void* buffer, size_t msgsize) {
-
   printf("(%ld,%d)\n", ((Msgbuf*)buffer)->mtype, j);
-
   ((Msgbuf*)buffer)->receiver = j;
   if (msgsnd(queue_id[j], buffer, msgsize, 0) == -1) {
     perror("msgsnd error");
@@ -44,7 +42,10 @@ void broadcast(const void* buffer, size_t msgsize) {
   long aux= ((Msgbuf*)buffer)->mtype;
   for (i = 0; i < N; i++){
     ((Msgbuf*)buffer)->mtype = aux;
-    send_message(i, buffer, msgsize);
+    if (msgsnd(queue_id[i], buffer, msgsize, 0) == -1) {
+      perror("broad-msgsnd error");
+      exit(2);
+    }  
   }
 }
 

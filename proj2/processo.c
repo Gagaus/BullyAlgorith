@@ -44,13 +44,16 @@ int main(int argc, char* argv[]) {
 	srand(time(NULL));
 	
 	while(1){
-		int e = rand() % 7;
+		int e = rand() % 50;
 		if (e==pid){
 			pState = DEAD;
+			outbuf.c = DEAD_WARNING;
+			outbuf.mtype = pid;
+			send_message(MONITOR_PID, &outbuf, sizeof(Msgbuf));
 			printf("p%ld: MORRI\n", pid);
 		}
 		else if (pState == IDLE){
-			if (e == 2){ // manda msg pro lider
+			if (e>=10 && e<=25){ // manda msg pro lider
 				pState = WAITING_LEADER;
 				outbuf.c = GENERIC;
 				outbuf.mtype = pid;

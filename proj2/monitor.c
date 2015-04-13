@@ -42,7 +42,7 @@ void printpid(int pid) {
 	if(from==pid) {
 		char asc_msg[100], aux[50];
 		asc_msg[0] = '\0';
-		sprintf(aux," %s→  ",current_msg_content);
+		sprintf(aux," %s→ ",current_msg_content);
 		strcat(asc_msg, aux);
 		if(to==-1) {
 			sprintf(aux,"*");
@@ -80,16 +80,25 @@ int main() {
 	get_queues();
 	while(1) {
 		receive_message(MONITOR_PID, &inbuf, sizeof(Msgbuf));
-		from = inbuf.mtype;
-		to = inbuf.receiver;
-		current_msg_content = msgs[inbuf.c];
-		if(inbuf.c == COORDINATOR) {
-			to = -1;
-			leader = inbuf.mtype;
+		if(inbuf.c == DEAD_WARNING) {
+			is_dead[inbuf.mtype] = 1;
+		}
+		else {
+			from = inbuf.mtype;
+			to = inbuf.receiver;
+			current_msg_content = msgs[inbuf.c];
+			is_dead[inbuf.mtype] = 0;
+			if(inbuf.c == COORDINATOR) {
+				to = -1;
+				leader = inbuf.mtype;
+			}
 		}
 		ymove(20);
 		print_system_status();
-		sleep(1);
+		sleep(2);
+
+		// int i;
+		// for(i=0;i<100000000; ++i);
 	}
 	return 0;
 }

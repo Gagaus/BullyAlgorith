@@ -16,7 +16,7 @@
 #define DS_MESSAGE_TYPE 0
 #define MONITOR_PID 0
 
-typedef enum {ELECTION, OK, COORDINATOR, GENERIC} contentMsg;
+typedef enum {ELECTION, OK, COORDINATOR, GENERIC, DEAD_WARNING} contentMsg;
 typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
 
 typedef struct msgbuf {
