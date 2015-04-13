@@ -30,7 +30,7 @@ void send_message(int j, const void* buffer, size_t msgsize) {
     perror("msgsnd error");
     exit(2);
   }
-  if (msgsnd(queue_id[MONITOR_PID], buffer, msgsize, 0) == -1) {
+  if (((Msgbuf*)buffer)->c != DEAD_WARNING && msgsnd(queue_id[MONITOR_PID], buffer, msgsize, 0) == -1) {
     perror("msgsnd to monitor error");
     exit(2);
   }  

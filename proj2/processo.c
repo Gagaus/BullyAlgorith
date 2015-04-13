@@ -7,7 +7,7 @@
 
 #define TIMEOUT 10
 #define SLEEP_TIME 1
-#define TIME_OF_DEATH 10
+#define TIME_OF_DEATH 20
 #define NUM_PROCESS 6
 
 long pid;    /* Process' id */
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	
 	while(1){
 		int e = rand() % 50;
-		if (e==pid){
+		if (e==pid || (pid == leader && e < 5)){
 			pState = DEAD;
 			outbuf.c = DEAD_WARNING;
 			outbuf.mtype = pid;
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 		}
 		else if (pState == WAITING_LEADER){
 			int j = 0;
-			while (j < TIMEOUT){
+			while (j < TIMEOUT/2){
 				if (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) < 0){ // FAZER WHILE POR TEMṔO. 
 					sleep(SLEEP_TIME);
 					j++;
@@ -168,6 +168,9 @@ int main(int argc, char* argv[]) {
 			while (nowait_receive_message(pid, &inbuf, sizeof(Msgbuf)) != -1)
 				{} // zera minha fila
 			pState = CALL_ELECTION;
+			outbuf.c = DEAD_WARNING;
+			outbuf.mtype = pid;
+			send_message(MONITOR_PID, &outbuf, sizeof(Msgbuf));
 		}
 	}
 	return 0;

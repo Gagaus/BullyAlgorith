@@ -1,0 +1,13 @@
+1 -(GENERIC)-> 6
+2 -(GENERIC)-> 6
+5 -(GENERIC)-> 6
+3 -(GENERIC)-> 6
+4 -(GENERIC)-> 6
+6 -(GENERIC)-> 1
+6 -(GENERIC)-> 2
+6 -(GENERIC)-> 5
+6 -(GENERIC)-> 3
+6 -(GENERIC)-> 4
+5 IS DEAD
+1 -(GENERIC)-> 6
+2 -(GENERIC)-> 6

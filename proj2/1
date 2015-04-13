@@ -1,0 +1,35 @@
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: illegal key (0x00000000)
+ipcrm: unknown argument: 2
+
+Usage:
+ ipcrm [options]
+ ipcrm shm|msg|sem <id>...
+
+Options:
+ -m, --shmem-id <id>        remove shared memory segment by id
+ -M, --shmem-key <key>      remove shared memory segment by key
+ -q, --queue-id <id>        remove message queue by id
+ -Q, --queue-key <key>      remove message queue by key
+ -s, --semaphore-id <id>    remove semaphore by id
+ -S, --semaphore-key <key>  remove semaphore by key
+ -a, --all[=shm|msg|sem]    remove all (in the specified category)
+ -v, --verbose              explain what is being done
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see ipcrm(1).
