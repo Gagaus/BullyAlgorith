@@ -1,8 +1,0 @@
-DESCRIÇÃO DE REQUISITOS:
-	1.1.1.1.1.1.1.1.1.1: Inicializar os processos
-	1.1.1.1.1.1.1.1.1.2: Periodicamente bloquear meu proprio processo
-	1.1.1.1.1.1.1.1.1.3: Periodicamente manda mensagem pro lider
-	1.1.1.1.1.1.1.1.1.4: Se ele nao responder, timeout. Convocar eleicoes com os maiores que eu
-	1.1.1.1.1.1.1.1.1.4.1: Se não responderem, eu sou o lider
-	1.1.1.1.1.1.1.1.1.4.2: Se responderem, eu paro
-	1.5: Se eu for o lider, broadcast de coordinator
