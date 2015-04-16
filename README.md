@@ -25,4 +25,6 @@ Note que para iniciar mais processos é preciso alterar a constante N no código
 
 O monitor visual mostra cada um dos 6 processos como um vértice de um "hexágono" na tela. O processo lider é indicado com colchetes []. Quando um processo morre, ele é retirado da tela; ao reviver, volta no mesmo lugar. O monitor também mostra todas as trocas de mensagens entre processos para eleição de líderes, conforme as regras do algoritmo.
 
+O algoritmo é executado de forma rápida; por isso, às vezes não é possível verificar sua corretude facilmente. Por esse motivo, além do auxílio visual, ao ser fechado o monitor salva num arquivo "log.txt" todas as mensagens enviadas no sistema, além de mortes e renascimentos de processos. Analisando-se esse log pode-se comprovar a crretude do algoritmo implementado.
+
 ----------------------------------------------------

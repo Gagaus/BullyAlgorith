@@ -17,7 +17,9 @@ E em terminais diferentes os processos (ou no mesmo terminal concatenados por &)
 
 $ ./processo 1 & ./processo 2 & ./processo 3 & ./processo 4 & ./processo 5 & ./processo 6
 
-(inicie os processos com 1, para nós o processo 0 é o monitor).
+Inicie os processos com 1, para nós o processo 0 é o monitor. Lembre-se do comando útil para matar os processos, já que todos estão em loop infinito:
+
+$ pkill -9 processo
 
 Note que para iniciar mais processos é preciso alterar a constante N no código-fonte; porém, para o monitor visual funcionar, é obrigatório que sejam 6 processos.
 

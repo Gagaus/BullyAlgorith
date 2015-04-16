@@ -1,5 +1,11 @@
 /*
  *  Distributed system implementation using IPC.
+ * 
+ *  Todos os processos de envio de mensagens usados pelos processos estão
+ * neste arquivo. Note que ele controla o envio de mensagens: quando um processo
+ * decide comunicar-se com outro usando estas funções, note que o monitor,
+ * processo 0, também é avisado. Dessa forma, ele sabe o que imprimir 
+ * na tela e no log.
  */
 
 #include <errno.h>
@@ -24,7 +30,6 @@ void get_queues() {
 
 /* Send a message to Pj */
 void send_message(int j, const void* buffer, size_t msgsize) {
-  printf("(%ld,%d)\n", ((Msgbuf*)buffer)->mtype, j);
   ((Msgbuf*)buffer)->receiver = j;
   if (msgsnd(queue_id[j], buffer, msgsize, 0) == -1) {
     perror("msgsnd error");

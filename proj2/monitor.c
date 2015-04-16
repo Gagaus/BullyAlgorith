@@ -1,3 +1,7 @@
+/* 
+ * Gerencia a impressão de conteúdo na tela e no log de envio de mensagens.
+ */
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -85,6 +89,7 @@ void print_system_status() {
 	ymove(1);
 }
 
+/** Ao receber um sinal de "^C" fecha o arquivo de log */
 void sig_handler(int signo) {
 	if (signo == SIGINT) {
 		fclose(fp);
@@ -94,8 +99,7 @@ void sig_handler(int signo) {
 
 int main() {
 	remove_queues();
-	// system("ipcs -a | grep 0x | awk '{printf( \"-Q %s \", $1 )}' | xargs ipcrm 2&>1 /dev/null");
-	signal(SIGINT, sig_handler);
+	signal(SIGINT, sig_handler); // gerencia o sinal de ^C
 	Msgbuf inbuf;
 	fp = fopen("log.txt", "w");
 	leader = 6;

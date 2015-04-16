@@ -16,7 +16,20 @@
 #define DS_MESSAGE_TYPE 0
 #define MONITOR_PID 0
 
+/** Há cinco tipos de mensagens:
+ * GENERIC testa se o lider ainda está vivo;
+ * ELECTION pede eleição;
+ * OK é a resposta de nós superiores a pedidos de eleição inferiores
+ * COORDINATOR é a mensagens broadcasted aos processos anunciando o novo líder
+ * DEAD_WARNING é enviado diretamente ao monitor quando um processo morre ou volta à vida*/
 typedef enum {ELECTION, OK, COORDINATOR, GENERIC, DEAD_WARNING} contentMsg;
+
+/** Os processos são baseados em uma máquina de estados:
+ * IDLE é um processo não-líder que ainda não está esperando mensagens
+ * DEAD é um processo morto
+ * CALL_ELECTION é o estado no qual o processo pede eleição
+ * WAITING_LEADER acontece quando um processo está aguardando uma resposta GENERIC do líder
+ * LEADER é o estado que um processo assume quando é líder */
 typedef enum {IDLE, DEAD, CALL_ELECTION, WAITING_LEADER, LEADER} state;
 
 typedef struct msgbuf {
